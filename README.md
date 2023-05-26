@@ -20,13 +20,13 @@ If you are using [Scaleway IAM](/identity-and-access-management/iam/how-to/activ
 2. Create a function from this template:
 
   ```shell
-  serverless create --path my-func --template-url https://github.com/scaleway/serverless-scaleway-functions/tree/master/examples/${TEMPLATE}
+  serverless create --path ${TEMPLATE}-func --template-url https://github.com/scaleway/serverless-scaleway-functions/tree/master/examples/${TEMPLATE}
   ```
 
 3. Install dependencies:
 
   ```shell
-  cd my-func
+  cd ${TEMPLATE}-func
   npm i
   ```
 
@@ -50,8 +50,6 @@ Serverless Framework handles everything from creating namespaces to function/cod
 - [Configuration](#configuration)
 - [Supported commands](#supported-commands)
 - [Security and secret management](#security-and-secret-management)
-- [Events](#events)
-- [Custom domains](#custom-domains)
 - [Deployment methods](#deployment-methods)
 - [Local testing](#local-testing)
 - [Managing containers](#managing-containers)
@@ -215,15 +213,11 @@ custom:
               key-b: "value-b"
 ```
 
-### Deployment methods
+## Auto-deletion
 
-At Scaleway, there are multiple ways to create Serverless Functions and Serverless Containers. These include: the CLI, APIs, the Scaleway console, Serverless Framework and Terraform.
+By default, the `serverless deploy` command applies the configuration located in your `serverless.yml` and removes functions in that namespace that are not in the file.
 
-The `serverless deploy` command applies the configuration located in your `serverless.yml` and removes functions that are not in the file to ensure a single source of truth.
-
-This can be controlled using the `singleSource` option. By default its value is `false`.
-
-If `singleSource` is set to `true`, functions and containers not defined in your serverless configuration file will be removed the next time you run the `serverless deploy` command.
+This can be switched off by setting the `singleSource` option to `false`.
 
 ### Local testing
 
@@ -233,48 +227,6 @@ Documentation is available through runtimes frameworks for :
 * [Go](https://github.com/scaleway/serverless-functions-go)
 * [Python](https://github.com/scaleway/serverless-functions-python)
 * [Node](https://github.com/scaleway/serverless-functions-node)
-
-### Managing containers
-
->**Requirements:**
-- You have [created a Container Registry namespace](https://www.scaleway.com/en/docs/compute/container-registry/how-to/create-namespace/)
-- You have installed Docker and can build and push your image to your registry.
-
-To manage your containers, you must first define them in the `custom.containers` field in your `serverless.yml` configuration file.
-
-Each container must specify the relative path of its application directory (containing the Dockerfile, and all files related to the application to deploy):
-
-```yml
-custom:
-  containers:
-    mycontainer:
-      directory: my-container-directory
-      # port: 8080
-      # Environment only available in this container
-      env:
-        MY_VARIABLE: "my-value"
-```
-
-Below is an example of the files you should have in your application directory. The directory that contains your Dockerfile and scripts is called `my-container-directory`.
-
-```
-.
-├── my-container-directory
-│   ├── Dockerfile
-│   ├── requirements.txt
-│   ├── server.py
-│   └── (...)
-├── node_modules
-│   ├── serverless-scaleway-functions
-│   └── (...)
-├── package-lock.json
-├── package.json
-└── serverless.yml
-```
-
-Scaleway's platform will automatically inject a PORT environment variable on which your server should be listening for incoming traffic. By default, this PORT is 8080. You can change the `port` in the `serverless.yml` file.
-
-You can use the container example provided on this [documentation page](https://github.com/scaleway/serverless-scaleway-functions/tree/master/examples/container) to get started.
 
 ## Logs
 
